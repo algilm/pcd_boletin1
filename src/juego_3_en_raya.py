@@ -42,3 +42,44 @@ def jugada_ganadora(movimientos_jugador, n=3):
         if len(columnas) == n:
             return True
     return False
+
+if __name__ == "__main__":
+    n = int(input("Introduce el tamaño del tablero cuadrado: "))
+    casillas_libres = n * n
+    jugador_activo = 0
+
+    movimientos_jugador_1 = {}
+    movimientos_jugador_2 = {}
+    movimientos_jugadores = [movimientos_jugador_1, movimientos_jugador_2]
+
+    mostrar_tablero(n, movimientos_jugadores)
+
+    while casillas_libres > 0:
+        entrada = input(f"JUGADOR {jugador_activo + 1} (x,y): ")
+        try:
+            x, y = map(int, entrada.split(','))
+            x -= 1
+            y -= 1
+        except ValueError:
+            print("Formato incorrecto. Usa x,y")
+            continue
+
+        movimientos_jugador_activo = movimientos_jugadores[jugador_activo]
+        movimientos_otro_jugador = movimientos_jugadores[(jugador_activo + 1) % 2]
+
+        if movimiento_valido(n, x, y, movimientos_otro_jugador):
+            columnas = movimientos_jugador_activo.get(x, [])
+            columnas.append(y)
+            movimientos_jugador_activo[x] = columnas
+
+            print("\033c", end="")  # limpiar pantalla en macOS/Linux
+            mostrar_tablero(n, movimientos_jugadores)
+
+            if jugada_ganadora(movimientos_jugador_activo, n):
+                print(f"🎉 ENHORABUENA JUGADOR {jugador_activo + 1}, HAS GANADO")
+                break
+
+            jugador_activo = (jugador_activo + 1) % 2
+            casillas_libres -= 1
+        else:
+            print("Movimiento inválido. Intenta de nuevo.")
